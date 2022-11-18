@@ -25,28 +25,32 @@ function handleFormSubmit(e) {
   e.preventDefault();
   page = 1;
   query = e.target.elements.searchQuery.value.trim();
-  fetchPixabayImages(query, page).then(({ hits, totalHits }) => {
-    galleryEl.innerHTML = '';
-    if (!hits.length) {
-      Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-      return;
-    }
-    imagesAvailable = totalHits;
-    const markup = hits.map(image => cardTpl(image)).join('');
-    galleryEl.innerHTML = markup;
-    lightbox.refresh();
-    Notify.info(`Hooray! We found ${totalHits} images.`);
-  });
+  fetchPixabayImages(query, page)
+    .then(({ hits, totalHits }) => {
+      galleryEl.innerHTML = '';
+      if (!hits.length) {
+        Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+        return;
+      }
+      imagesAvailable = totalHits;
+      const markup = hits.map(image => cardTpl(image)).join('');
+      galleryEl.innerHTML = markup;
+      lightbox.refresh();
+      Notify.info(`Hooray! We found ${totalHits} images.`);
+    })
+    .catch(console.log);
 }
 
 function handleDocumentScroll({ target }) {
   if (target.documentElement.scrollHeight - target.documentElement.scrollTop < 2000) {
     page += 1;
-    fetchPixabayImages(query, page).then(({ hits }) => {
-      const markup = hits.map(image => cardTpl(image)).join('');
-      galleryEl.insertAdjacentHTML('beforeend', markup);
-      lightbox.refresh();
-    });
+    fetchPixabayImages(query, page)
+      .then(({ hits }) => {
+        const markup = hits.map(image => cardTpl(image)).join('');
+        galleryEl.insertAdjacentHTML('beforeend', markup);
+        lightbox.refresh();
+      })
+      .catch(console.log);
   }
   if (page * IMAGES_PER_PAGE >= imagesAvailable) {
     document.removeEventListener('scroll', throttledHandlerDocumentScroll);
