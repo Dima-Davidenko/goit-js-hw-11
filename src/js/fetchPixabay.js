@@ -2,7 +2,7 @@ import axios from 'axios';
 import { pixabayKey, IMAGES_PER_PAGE } from './utils/envConsts.js';
 
 const axiosPixabay = axios.create({
-  baseURL: 'https://pixabay.com/api',
+  baseURL: 'https://pixabay.com/api/',
   params: {
     key: pixabayKey,
     image_type: 'photo',

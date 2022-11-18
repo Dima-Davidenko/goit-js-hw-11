@@ -11,6 +11,7 @@ const galleryEl = document.querySelector('.gallery');
 let page = null;
 let query = null;
 let imagesAvailable = null;
+let isFetching = false;
 const throttledHandlerDocumentScroll = throttle(handleDocumentScroll, 500);
 
 const lightbox = new SimpleLightbox('.gallery a', {
@@ -42,15 +43,21 @@ function handleFormSubmit(e) {
 }
 
 function handleDocumentScroll({ target }) {
+  if (isFetching) return;
   if (target.documentElement.scrollHeight - target.documentElement.scrollTop < 2000) {
+    isFetching = true;
     page += 1;
     fetchPixabayImages(query, page)
       .then(({ hits }) => {
         const markup = hits.map(image => cardTpl(image)).join('');
         galleryEl.insertAdjacentHTML('beforeend', markup);
         lightbox.refresh();
+        isFetching = false;
       })
-      .catch(console.log);
+      .catch(error => {
+        console.log(error);
+        isFetching = false;
+      });
   }
   if (page * IMAGES_PER_PAGE >= imagesAvailable) {
     document.removeEventListener('scroll', throttledHandlerDocumentScroll);
