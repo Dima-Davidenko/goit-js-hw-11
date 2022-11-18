@@ -2,6 +2,7 @@
 
 body {
   overflow-y: scroll;
+  font-family: 'Roboto', sans-serif;
 }
 
 .search-form {
@@ -23,6 +24,7 @@ body {
   grid-row-gap: 20px;
   grid-template-columns: repeat(auto-fill, minmax(250px, 300px));
   justify-content: center;
+  padding: 20px;
 }
 .gallery img {
   max-width: 100%;
