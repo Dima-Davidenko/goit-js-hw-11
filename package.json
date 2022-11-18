@@ -1,0 +1,36 @@
+{
+  "name": "goit-js-hw-11",
+  "version": "1.0.0",
+  "description": "",
+  "source": "src/index.html",
+  "targets": {
+    "default": {
+      "distDir": "./dist",
+      "publicUrl": "/goit-js-hw-11/"
+    }
+  },
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dima-Davidenko/goit-js-hw-11.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dima-Davidenko/goit-js-hw-11/issues"
+  },
+  "homepage": "https://github.com/Dima-Davidenko/goit-js-hw-11#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "os-browserify": "^0.3.0",
+    "parcel": "^2.8.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10"
+  }
+}
