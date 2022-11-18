@@ -28,11 +28,11 @@ function handleFormSubmit(e) {
   fetchPixabayImages(query, page)
     .then(({ hits, totalHits }) => {
       galleryEl.innerHTML = '';
+      imagesAvailable = totalHits;
       if (!hits.length) {
         Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         return;
       }
-      imagesAvailable = totalHits;
       const markup = hits.map(image => cardTpl(image)).join('');
       galleryEl.innerHTML = markup;
       lightbox.refresh();
