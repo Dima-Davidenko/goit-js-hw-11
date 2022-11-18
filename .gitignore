@@ -1,5 +1,6 @@
 #Secret variables
 .env
+temp.js
 
 # Logs
 logs
