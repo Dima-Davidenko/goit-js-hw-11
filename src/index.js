@@ -1,26 +1,25 @@
 import { fetchPixabayImages } from './js/fetchPixabay.js';
-import { IMAGES_PER_PAGE } from './js/utils/envConsts.js';
+import { IMAGES_PER_PAGE, THROTTLE_DELAY, LIGHTBOX_PARAMS } from './js/utils/envConsts.js';
+
 import { Notify } from 'notiflix';
 import throttle from 'lodash.throttle';
-import cardTpl from './js/templates/cardTpl.hbs';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.css';
 
+import cardTpl from './js/templates/cardTpl.hbs';
+
+import './css/styles.css';
+
 const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
+
 let page = null;
 let query = null;
 let imagesAvailable = null;
 let isFetching = false;
-const throttledHandlerDocumentScroll = throttle(handleDocumentScroll, 500);
+const throttledHandlerDocumentScroll = throttle(handleDocumentScroll, THROTTLE_DELAY);
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-  animationSlide: false,
-  animationSpeed: 500,
-  maxZoom: 5,
-});
+const lightbox = new SimpleLightbox('.gallery a', LIGHTBOX_PARAMS);
 
 function handleFormSubmit(e) {
   e.preventDefault();
@@ -39,12 +38,21 @@ function handleFormSubmit(e) {
       lightbox.refresh();
       Notify.info(`Hooray! We found ${totalHits} images.`);
     })
-    .catch(console.log);
+    .then(showMoreImages)
+    .catch(error => Notify.failure(error.message));
 }
 
-function handleDocumentScroll({ target }) {
+function handleDocumentScroll() {
   if (isFetching) return;
-  if (target.documentElement.scrollHeight - target.documentElement.scrollTop < 2000) {
+  showMoreImages();
+  if (page * IMAGES_PER_PAGE >= imagesAvailable) {
+    document.removeEventListener('scroll', throttledHandlerDocumentScroll);
+  }
+}
+
+function showMoreImages() {
+  if (isFetching || page * IMAGES_PER_PAGE >= imagesAvailable) return;
+  if (document.documentElement.scrollHeight - document.documentElement.scrollTop < 2000) {
     isFetching = true;
     page += 1;
     fetchPixabayImages(query, page)
@@ -54,15 +62,13 @@ function handleDocumentScroll({ target }) {
         lightbox.refresh();
         isFetching = false;
       })
+      .then(showMoreImages)
       .catch(error => {
-        console.log(error);
+        Notify.failure(error.message);
         isFetching = false;
       });
-  }
-  if (page * IMAGES_PER_PAGE >= imagesAvailable) {
-    document.removeEventListener('scroll', throttledHandlerDocumentScroll);
   }
 }
 
 formEl.addEventListener('submit', handleFormSubmit);
-document.addEventListener('scroll', throttledHandlerDocumentScroll);
+window.addEventListener('scroll', throttledHandlerDocumentScroll);

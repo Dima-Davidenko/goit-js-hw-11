@@ -1,0 +1,54 @@
+@import '~/node_modules/modern-normalize/modern-normalize.css';
+
+body {
+  overflow-y: scroll;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  margin-bottom: 20px;
+  background-color: rgb(121, 33, 183);
+}
+
+.search-form input {
+  margin-right: 20px;
+}
+
+.gallery {
+  display: grid;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 300px));
+  justify-content: center;
+}
+.gallery img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 0 16px #333;
+  transition: scale 0.25s ease-in-out;
+}
+.gallery img:hover {
+  box-shadow: 0 0 32px #333;
+  scale: 1.05;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 3px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(121, 33, 183);
+  border-radius: 5px;
+}
