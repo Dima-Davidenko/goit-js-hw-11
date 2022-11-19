@@ -15,7 +15,7 @@ const galleryEl = document.querySelector('.gallery');
 
 let page = null;
 let query = null;
-let imagesAvailable = null;
+let pagesAvailable = null;
 let isFetching = false;
 const throttledHandlerDocumentScroll = throttle(handleDocumentScroll, THROTTLE_DELAY);
 
@@ -28,7 +28,7 @@ function handleFormSubmit(e) {
   fetchPixabayImages(query, page)
     .then(({ hits, totalHits }) => {
       galleryEl.innerHTML = '';
-      imagesAvailable = totalHits;
+      pagesAvailable = Math.ceil(totalHits / IMAGES_PER_PAGE);
       if (!hits.length) {
         Notify.failure('Sorry, there are no images matching your search query. Please try again.');
         return;
@@ -37,6 +37,7 @@ function handleFormSubmit(e) {
       galleryEl.innerHTML = markup;
       lightbox.refresh();
       Notify.info(`Hooray! We found ${totalHits} images.`);
+      document.addEventListener('scroll', throttledHandlerDocumentScroll);
     })
     .then(showMoreImages)
     .catch(error => Notify.failure(error.message));
@@ -45,13 +46,13 @@ function handleFormSubmit(e) {
 function handleDocumentScroll() {
   if (isFetching) return;
   showMoreImages();
-  if (page * IMAGES_PER_PAGE >= imagesAvailable) {
+  if (page === pagesAvailable) {
     document.removeEventListener('scroll', throttledHandlerDocumentScroll);
   }
 }
 
 function showMoreImages() {
-  if (isFetching || page * IMAGES_PER_PAGE >= imagesAvailable) return;
+  if (isFetching || page === pagesAvailable) return;
   if (document.documentElement.scrollHeight - document.documentElement.scrollTop < 2000) {
     isFetching = true;
     page += 1;
@@ -71,4 +72,3 @@ function showMoreImages() {
 }
 
 formEl.addEventListener('submit', handleFormSubmit);
-window.addEventListener('scroll', throttledHandlerDocumentScroll);
