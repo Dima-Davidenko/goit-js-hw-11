@@ -21,26 +21,27 @@ const throttledHandlerDocumentScroll = throttle(handleDocumentScroll, THROTTLE_D
 
 const lightbox = new SimpleLightbox('.gallery a', LIGHTBOX_PARAMS);
 
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
   e.preventDefault();
   page = 1;
   query = e.target.elements.searchQuery.value.trim();
-  fetchPixabayImages(query, page)
-    .then(({ hits, totalHits }) => {
-      galleryEl.innerHTML = '';
-      pagesAvailable = Math.ceil(totalHits / IMAGES_PER_PAGE);
-      if (!hits.length) {
-        Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-        return;
-      }
-      const markup = hits.map(image => cardTpl(image)).join('');
-      galleryEl.innerHTML = markup;
-      lightbox.refresh();
-      Notify.info(`Hooray! We found ${totalHits} images.`);
-      document.addEventListener('scroll', throttledHandlerDocumentScroll);
-    })
-    .then(showMoreImages)
-    .catch(error => Notify.failure(error.message));
+  try {
+    const { hits, totalHits } = await fetchPixabayImages(query, page);
+    galleryEl.innerHTML = '';
+    pagesAvailable = Math.ceil(totalHits / IMAGES_PER_PAGE);
+    if (!hits.length) {
+      Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+      return;
+    }
+    const markup = hits.map(image => cardTpl(image)).join('');
+    galleryEl.innerHTML = markup;
+    lightbox.refresh();
+    Notify.info(`Hooray! We found ${totalHits} images.`);
+    document.addEventListener('scroll', throttledHandlerDocumentScroll);
+    showMoreImages();
+  } catch (error) {
+    Notify.failure(error.message);
+  }
 }
 
 function handleDocumentScroll() {
@@ -51,23 +52,21 @@ function handleDocumentScroll() {
   }
 }
 
-function showMoreImages() {
+async function showMoreImages() {
   if (isFetching || page === pagesAvailable) return;
   if (document.documentElement.scrollHeight - document.documentElement.scrollTop < 2000) {
     isFetching = true;
     page += 1;
-    fetchPixabayImages(query, page)
-      .then(({ hits }) => {
-        const markup = hits.map(image => cardTpl(image)).join('');
-        galleryEl.insertAdjacentHTML('beforeend', markup);
-        lightbox.refresh();
-        isFetching = false;
-      })
-      .then(showMoreImages)
-      .catch(error => {
-        Notify.failure(error.message);
-        isFetching = false;
-      });
+    try {
+      const { hits } = await fetchPixabayImages(query, page);
+      const markup = hits.map(image => cardTpl(image)).join('');
+      galleryEl.insertAdjacentHTML('beforeend', markup);
+      lightbox.refresh();
+      showMoreImages();
+    } catch (error) {
+      Notify.failure(error.message);
+    }
+    isFetching = false;
   }
 }
 
