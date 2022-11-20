@@ -25,6 +25,7 @@ async function handleFormSubmit(e) {
   e.preventDefault();
   page = 1;
   query = e.target.elements.searchQuery.value.trim();
+  if (!query) return;
   try {
     const { hits, totalHits } = await fetchPixabayImages(query, page);
     galleryEl.innerHTML = '';
