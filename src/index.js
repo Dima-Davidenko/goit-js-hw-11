@@ -63,7 +63,6 @@ async function showMoreImages() {
       const markup = hits.map(image => cardTpl(image)).join('');
       galleryEl.insertAdjacentHTML('beforeend', markup);
       lightbox.refresh();
-      showMoreImages();
     } catch (error) {
       Notify.failure(error.message);
     }
