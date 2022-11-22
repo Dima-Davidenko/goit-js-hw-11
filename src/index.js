@@ -54,7 +54,6 @@ function handleDocumentScroll() {
 }
 
 async function showMoreImages() {
-  // new comment sdfsdfs ssdfds
   if (isFetching || page === pagesAvailable) return;
   if (document.documentElement.scrollHeight - document.documentElement.scrollTop < 2000) {
     isFetching = true;
